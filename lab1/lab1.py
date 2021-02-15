@@ -1,4 +1,8 @@
 import random
+import time
+from _datetime import timedelta
+
+startTime = time.perf_counter()
 
 # matrix generation from the results of the experiment
 experimentMatrix = [[random.randint(0, 20) for _ in range(3)] for _ in range(8)]
@@ -55,3 +59,6 @@ supplementedY.sort()
 
 print("\nВаріант 207: Критерій вибору -->Yет")
 print("-->Yет =", supplementedY.pop(supplementedY.index(Yet) - 1))
+
+endTime = time.perf_counter()
+print("Час виконання програми:", timedelta(seconds=endTime - startTime))
