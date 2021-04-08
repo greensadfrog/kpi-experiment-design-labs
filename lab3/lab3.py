@@ -1,8 +1,8 @@
 from tabulate import tabulate
 import random, math
 import numpy as np
-from scipy.stats import f  # ось тут
-from scipy.stats import t  # і ось тут імпортується scipy
+from scipy.stats import f  # імпортуються дані для критерію Фішера
+from scipy.stats import t  # імпортуються дані для критерію Стьюдента
 
 # Variant 207
 
@@ -157,7 +157,7 @@ bettaList = [round(i, 2) for i in bettaList]
 tList = [bettaList[i] * S for i in range(N)]
 
 for i in range(N):
-    if tList[i] < t.ppf(q=0.975, df=f3):  # використовується тут
+    if tList[i] < t.ppf(q=0.975, df=f3):  # перевірка за критерієм Стьюдента з використанням scipy
         bList[i] = 0
         d -= 1
         print('Виключаємо з рівняння коефіціент b' + str(i))
@@ -173,7 +173,7 @@ S_ad = (m * sum(
      range(N)]) / f4)
 Fp = S_ad / Sb
 
-if Fp > f.ppf(q=0.95, dfn=f4, dfd=f3):  # і ось тут
+if Fp > f.ppf(q=0.95, dfn=f4, dfd=f3):  # перевірка за критерієм Фішера з використанням scipy
     print('Рівняння регресії неадекватно оригіналу при рівні значимості 0.05')
 else:
     print('Рівняння регресії адекватно оригіналу при рівні значимості 0.05')
