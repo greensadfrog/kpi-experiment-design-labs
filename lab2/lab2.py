@@ -21,19 +21,18 @@ X2max = 10
 normX2min = 0
 normX2max = 1
 
-# -----Матриця планування, середнє значення, дисперсії по рядках------
+Fvu1List = [0, 0, 0]
+ThetaList = [0, 0, 0]
+RvuList = [0, 0, 0]
 
 planningMatrix = [[random.randint(Ymin, Ymax) for y in range(m)] for row in range(3)]
 avgYList = [round(sum(planningMatrix[i]) / len(planningMatrix[i]), 1) for i in range(3)]
 dispList = [
-    [round(sum(((planningMatrix[j][i] - avgYList[j]) ** 2) for i in range(m)) / m, 1)] for j in range(len(avgYList))]
-
-# -----Основне відхилення-----
+    [round(sum(((planningMatrix[j][i] - avgYList[j]) ** 2) for i in range(m)) / m, 1)] for j in
+    range(len(avgYList))]
 
 mainDispersion = round(math.sqrt((2 * (2 * m - 2)) / (m * (m - 4))), 1)
 
-# -----Fvu, θvu, Rvu -----
-Fvu1List = [0, 0, 0]
 Fvu1List[0] = round(dispList[0][0] / dispList[1][0], 1) if dispList[0][0] >= dispList[1][0] else round(
     dispList[1][0] / dispList[0][0], 1)
 Fvu1List[1] = round(dispList[0][0] / dispList[2][0], 1) if dispList[0][0] >= dispList[2][0] else round(
@@ -43,8 +42,6 @@ Fvu1List[2] = round(dispList[2][0] / dispList[1][0], 1) if dispList[2][0] >= dis
 
 ThetaList = [round(((m - 2) / m) * i, 1) for i in Fvu1List]
 RvuList = [round((math.fabs(ThetaList[i] - 1)) / mainDispersion, 1) for i in range(len(ThetaList))]
-
-# -----Розрахунок нормованих коефіцієнтів рівняння регресії-----
 
 mx1 = (normX1min + normX1max + normX1min) / 3
 mx2 = (normX2min + normX2min + normX2max) / 3
@@ -63,11 +60,9 @@ b0 = np.linalg.det(np.array([[my, mx1, mx2], [a11, a1, a2], [a22, a2, a3]])) / \
 
 b1 = np.linalg.det(np.array([[1, my, mx2], [mx1, a11, a2], [mx2, a22, a3]])) / \
      np.linalg.det(np.array([[1, mx1, mx2], [mx1, a1, a2], [mx2, a2, a3]]))
-
 b2 = np.linalg.det(np.array([[1, mx1, my], [mx1, a1, a11], [mx2, a2, a22]])) / \
      np.linalg.det(np.array([[1, mx1, mx2], [mx1, a1, a2], [mx2, a2, a3]]))
 
-# -----Натуралізація коефіцієнтів-----
 deltaX1 = abs(X1max - X1min) / 2
 deltaX2 = abs(X2max - X2min) / 2
 
@@ -78,32 +73,37 @@ natural_a0 = b0 - b1 * x10 / deltaX1 - b2 * x20 / deltaX2
 natural_a1 = b1 / deltaX1
 natural_a2 = b2 / deltaX2
 
-# -----Вивід результатів-----
 
-print("\n Матриця планування:")
-print(
-    tabulate(
-        [["X1", "X2", "Y1", "Y2", "Y3", "Y4", "Y5", "Середній Y", "Fvu", "θvu", "Rvu"],
-         [normX1min] + [normX2min] + planningMatrix[0] + [avgYList[0]],
-         [normX1max] + [normX2min] + planningMatrix[1] + [avgYList[1]],
-         [normX1min] + [normX2max] + planningMatrix[2] + [avgYList[2]]],
+def main():
+    print("\n Матриця планування:")
+    print(
+        tabulate(
+            [["X1", "X2", "Y1", "Y2", "Y3", "Y4", "Y5", "Середній Y", "Fvu", "θvu", "Rvu"],
+             [normX1min] + [normX2min] + planningMatrix[0] + [avgYList[0]],
+             [normX1max] + [normX2min] + planningMatrix[1] + [avgYList[1]],
+             [normX1min] + [normX2max] + planningMatrix[2] + [avgYList[2]]],
+            headers="firstrow", tablefmt="pretty"))
+
+    print("\n Дисперсія по рядках")
+    print(tabulate(dispList, tablefmt="pretty"))
+    print("\n Основне відхилення = " + str(mainDispersion))
+
+    print("\n Дані для критерію Романовського:")
+    print(tabulate([
+        ["№", "Fvu", "θvu", "Rvu"],
+        [1, Fvu1List[0], ThetaList[0], RvuList[0]],
+        [2, Fvu1List[1], ThetaList[1], RvuList[1]],
+        [3, Fvu1List[2], ThetaList[2], RvuList[2]]],
         headers="firstrow", tablefmt="pretty"))
+    main()
 
-print("\n Дисперсія по рядках")
-print(tabulate(dispList, tablefmt="pretty"))
-print("\n Основне відхилення = " + str(mainDispersion))
-
-print("\n Дані для критерію Романовського:")
-print(tabulate([
-    ["№", "Fvu", "θvu", "Rvu"],
-    [1, Fvu1List[0], ThetaList[0], RvuList[0]],
-    [2, Fvu1List[1], ThetaList[1], RvuList[1]],
-    [3, Fvu1List[2], ThetaList[2], RvuList[2]]],
-    headers="firstrow", tablefmt="pretty"))
 
 if max(RvuList) >= Rcriterion:
     print("Дисперсія не однорідна, "
           "потрібно повторити експеримент.")
+    m += 1
+    print("Повторення експерименту для m = m + 1 : m == ", m)
+    main()
 else:
     print("\n--------------------")
     print("Дисперсія однорідна.")
