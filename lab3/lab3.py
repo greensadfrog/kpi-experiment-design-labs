@@ -1,8 +1,8 @@
 from tabulate import tabulate
 import random, math
 import numpy as np
-from scipy.stats import f  # ось використовується scipy
-from scipy.stats import t
+from scipy.stats import f  # ось тут
+from scipy.stats import t  # і ось тут імпортується scipy
 
 # Variant 207
 
@@ -157,7 +157,7 @@ bettaList = [round(i, 2) for i in bettaList]
 tList = [bettaList[i] * S for i in range(N)]
 
 for i in range(N):
-    if tList[i] < t.ppf(q=0.975, df=f3):  # ось тут
+    if tList[i] < t.ppf(q=0.975, df=f3):  # використовується тут
         bList[i] = 0
         d -= 1
         print('Виключаємо з рівняння коефіціент b' + str(i))
