@@ -4,6 +4,12 @@ import math
 from tabulate import tabulate
 from scipy.stats import f, t
 
+# ініціалізація початкових данних
+N = 8
+quantityOfExperiment = 100
+quantityOfImportantCoeffs = quantityOfExperiment * N
+quantityOfInsignificantCoeffs = 0
+
 
 def make_experiment(m=3):
     def dispersion(y_list, avg_y_list, m):
@@ -39,6 +45,7 @@ def make_experiment(m=3):
             make_experiment(4)
 
     def student_criterion(Sy, d):
+        global quantityOfInsignificantCoeffs
         print("\n=================Перевірка за критерієм Стьюдента=================\n")
         bettaList = [sum([Sy[i] * x0[0] for i in range(N)]) / N,
                      sum([Sy[i] * x1i[i] for i in range(N)]) / N,
@@ -56,6 +63,7 @@ def make_experiment(m=3):
             if tList[i] < t.ppf(q=0.975, df=f3):  # перевірка за критерієм Стьюдента з використанням scipy
                 bList[i] = 0
                 d -= 1
+                quantityOfInsignificantCoeffs += 1
                 print('Виключаємо з рівняння коефіціент b' + str(i))
         print("\n=================Отримане рівняння=================")
         print(str_y().format(r(bList[0]), r(bList[1]), r(bList[2]), r(bList[3]), r(bList[4]), r(bList[5]), r(bList[6]),
@@ -127,8 +135,6 @@ def make_experiment(m=3):
                             Sy[7]],
                         ], headers="firstrow", tablefmt="pretty"))
 
-    # ініціалізація початкових данних
-    N = 8
     if m == 3:
         tableHeader = ["X0", "X1", "X2", "X3", "X12", "X13", "X23", "X123", "Y1", "Y2", "Y3", "avgY", "S^2"]
     elif m == 4:
@@ -221,4 +227,8 @@ def make_experiment(m=3):
     fisher_criterion(d)
 
 
-make_experiment()
+for i in range(quantityOfExperiment):
+    make_experiment()
+
+print("Кількість значимих коефіцієнтів за 100 проведених експериментів:",
+      quantityOfImportantCoeffs - quantityOfInsignificantCoeffs)
