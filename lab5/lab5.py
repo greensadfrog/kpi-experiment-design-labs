@@ -82,8 +82,8 @@ def experiment(m):
     dispersions = [sum([(y[j][i] - y_response[j]) ** 2 for i in range(m)]) / m for j in range(n)]
     gp = max(dispersions) / sum(dispersions)
 
-    f1 = m - 1;
-    f2 = n;
+    f1 = m - 1
+    f2 = n
     q = 0.05
 
     if 11 <= f1 <= 16: f1 = 11
@@ -134,6 +134,9 @@ def experiment(m):
 
         if f_p > scipy.stats.f.ppf(q=0.95, dfn=f4, dfd=f3):
             print('\nРівняння регресії неадекватно оригіналу при рівні значимості 0.05')
+        elif perf_counter() - start_criterion_of_Fisher > 0.1:
+            print(
+                '\nПеревищено час перевірки моделі! Рівняння регресії неадекватно оригіналу при рівні значимості 0.05.')
         else:
             print('\nРівняння регресії адекватно оригіналу при рівні значимості 0.05')
 
